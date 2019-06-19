@@ -9,6 +9,8 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/NoActionBar">
+        <activity android:name=".CreateProductActivity"></activity>
+        <activity android:name=".WorkActivity" />
         <activity android:name=".MainScreenActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

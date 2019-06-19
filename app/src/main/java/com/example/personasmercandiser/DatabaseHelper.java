@@ -3,120 +3,92 @@ package com.example.personasmercandiser;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
-import android.widget.Button;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "SomeDB.db";
-    private static final int DATABASE_VERSION = 1;
-
-    public static final String LOGINTABLE_NAME = "Login";
-    public static final String LOGINTABLE_COL1 = "_id";
-    public static final String LOGINTABLE_COL2 = "email";
-    public static final String LOGINTABLE_COL3 = "password";
-
-    public static final String SHOPTTABLE_NAME = "Shop";
-    public static final String SHOPTTABLE_COL1 = "_id";
-    public static final String SHOPTTABLE_COL2 = "Name";
-    public static final String SHOPTTABLE_COL3 = "Address";
-    public static final String SHOPTTABLE_COL4 = "Longitude"; // Долгота
-    public static final String SHOPTTABLE_COL5 = "Latitude"; // Широта
-
+    public static final String LOGIN_TABLE_NAME = "Login";
+    public static final String LOGIN_TABLE_EMAIL = "email";
+    public static final String LOGIN_TABLE_PASSWORD = "password";
+    public static final String SHOP_TABLE_NAME = "Shop";
+    public static final String SHOP_TABLE_SHOPNAME = "Name";
+    public static final String SHOP_TABLE_ADDRESS = "Address";
+    public static final String SHOP_TABLE_LONGITUDE = "Longitude"; // Долгота
+    public static final String SHOP_TABLE_LATITUDE = "Latitude"; // Широта
+    private static final int DATABASE_VERSION = 11;
 
 
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        //TODO fix bug with "No such table Shop"
-        db.execSQL("CREATE TABLE Shop (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "Name TEXT," +
-                "Address TEXT," +
-                "Longitute TEXT," +
-                "Latitude TEXT);");
-
         db.execSQL("CREATE TABLE Login (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "email TEXT," +
                 "password TEXT);");
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(LOGIN_TABLE_EMAIL, "1");
+        contentValues.put(LOGIN_TABLE_PASSWORD, "1");
+        db.insert(LOGIN_TABLE_NAME, null, contentValues);
+        contentValues.clear();
+
+        db.execSQL("CREATE TABLE Shop (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "Name TEXT," +
+                "Address TEXT," +
+                "Longitude TEXT," +
+                "Latitude TEXT);");
+
+        contentValues.put(SHOP_TABLE_SHOPNAME, "Мария-ра");
+        contentValues.put(SHOP_TABLE_ADDRESS, "ул. Петра Сухова, 14, Барнаул, Алтайский край");
+        contentValues.put(SHOP_TABLE_LONGITUDE, "53.3784514");
+        contentValues.put(SHOP_TABLE_LATITUDE, "83.7325199");
+        db.insert(SHOP_TABLE_NAME, null, contentValues);
+        contentValues.clear();
+
+        contentValues.put(SHOP_TABLE_SHOPNAME, "Хорошее настроение");
+        contentValues.put(SHOP_TABLE_ADDRESS, "ул. Смирнова, 46, Барнаул, Алтайский край");
+        contentValues.put(SHOP_TABLE_LONGITUDE, "53.3703099");
+        contentValues.put(SHOP_TABLE_LATITUDE, "83.7354857");
+        db.insert(SHOP_TABLE_NAME, null, contentValues);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS table1");
+        db.execSQL("DROP TABLE IF EXISTS Login");
+        db.execSQL("DROP TABLE IF EXISTS Shop");
         onCreate(db);
     }
 
-    public boolean fillTables() {
-        //Login
-        SQLiteDatabase db = this.getWritableDatabase();
-        try {
-            this.getWritableDatabase();
-        } catch (SQLiteException ex) {
-            return true;
-        }
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(LOGINTABLE_COL2, "1");
-        contentValues.put(LOGINTABLE_COL3, "1");
-        db.insert(LOGINTABLE_NAME, null, contentValues);
-        contentValues.clear();
+    public String[] getShops() {
 
-        //Shop
-        contentValues.put(SHOPTTABLE_COL2, "Мария-ра");
-        contentValues.put(SHOPTTABLE_COL3, "ул. Петра Сухова, 14, Барнаул, Алтайский край, 656010");
-        contentValues.put(SHOPTTABLE_COL4, "53.3784514");
-        contentValues.put(SHOPTTABLE_COL5, "83.7325199");
-        db.insert(SHOPTTABLE_NAME, null, contentValues);
-        contentValues.clear();
-
-        contentValues.put(SHOPTTABLE_COL2, "Хорошее настроение");
-        contentValues.put(SHOPTTABLE_COL3, "ул. Смирнова, 46, Барнаул, Алтайский край, 656010");
-        contentValues.put(SHOPTTABLE_COL4, "53.3703099");
-        contentValues.put(SHOPTTABLE_COL5, "83.7354857");
-        db.insert(SHOPTTABLE_NAME, null, contentValues);
-
-        contentValues.clear();
-        db.close();
-        return false;
-    }
-
-    public ArrayList<String> getShops() {
-        String[] columns = { SHOPTTABLE_COL2, SHOPTTABLE_COL3 };
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(SHOPTTABLE_NAME, columns, null, null, null, null, null, null);
-        cursor.close();
+        Cursor cursor = db.query(SHOP_TABLE_NAME, new String[]{SHOP_TABLE_SHOPNAME, SHOP_TABLE_ADDRESS}, null, null, null, null, null);
 
-        ArrayList<String> shopsText = new ArrayList<>();
+        int rowCount = cursor.getCount();
+        String[] shopsText = new String[rowCount];
+
+        int i = 0;
         while (cursor.moveToNext()) {
-            shopsText.add("Название магазина - " + cursor.getString(0) + "\n" +
-                    "Адресс - " + cursor.getString(1));
+            shopsText[i] = "Название магазина - " + cursor.getString(0) + "\n" +
+                    "Адресс - " + cursor.getString(1);
+            i++;
         }
+        cursor.close();
         return shopsText;
     }
 
     public boolean checkLoginAndPass(String email, String pass) {
-        String[] columns = {LOGINTABLE_COL1};
         SQLiteDatabase db = this.getReadableDatabase();
-        String selection = LOGINTABLE_COL2 + "=?" + " and " + LOGINTABLE_COL3 + "=?";
+        String selection = LOGIN_TABLE_EMAIL + "=?" + " and " + LOGIN_TABLE_PASSWORD + "=?";
         String[] selectionArgs = {email, pass};
-        Cursor cursor = db.query(LOGINTABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        Cursor cursor = db.query(LOGIN_TABLE_NAME, null, selection, selectionArgs, null, null, null);
         int count = cursor.getCount();
         cursor.close();
         db.close();
 
-        if (count > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return count > 0;
     }
 }

@@ -1,13 +1,11 @@
 package com.example.personasmercandiser;
 
 import android.content.Intent;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,10 +21,6 @@ public class MainActivity extends AppCompatActivity {
         emailText = findViewById(R.id.email);
         passText = findViewById(R.id.pass);
         db = new DatabaseHelper(this);
-        boolean res = db.fillTables();
-        if (res) {
-            Toast.makeText(MainActivity.this ,"Не удалось подключиться к базе данных.", Toast.LENGTH_SHORT).show();
-        }
         buttonListeners();
     }
 

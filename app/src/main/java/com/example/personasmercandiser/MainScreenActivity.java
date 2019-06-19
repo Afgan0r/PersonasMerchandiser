@@ -1,29 +1,18 @@
 package com.example.personasmercandiser;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.view.menu.ListMenuPresenter;
-import android.view.View;
-import android.support.v4.view.GravityCompat;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.view.MenuItem;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 public class MainScreenActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -33,7 +22,7 @@ public class MainScreenActivity extends AppCompatActivity
     private NavigationView navigationView;
     private ActionBarDrawerToggle toggle;
     private ListView listView;
-    private ArrayList<String> buttonsText;
+    private String[] buttonsText;
     private DatabaseHelper db;
 
     @Override
@@ -47,6 +36,8 @@ public class MainScreenActivity extends AppCompatActivity
         listView=findViewById(R.id.ListView);
 
         db = new DatabaseHelper(this);
+        fillListView();
+//        db.fillTables();
 
         drawer = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
@@ -55,22 +46,21 @@ public class MainScreenActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
         listeners();
-        fillListView();
     }
 
     private void fillListView() {
-        db.fillTables();
-        db.checkLoginAndPass("1","1");
         buttonsText = db.getShops();
-//        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, buttonsText);
-//        listView.setAdapter(adapter);
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                String selectedItem = buttonsText.get(position);
-//                Toast.makeText(MainScreenActivity.this, selectedItem, Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, buttonsText);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = buttonsText[position];
+                Intent workScreen = new Intent(MainScreenActivity.this, WorkActivity.class);
+                workScreen.putExtra("ShopInf", selectedItem);
+                startActivity(workScreen);
+            }
+        });
     }
 
     private void listeners() {
@@ -92,7 +82,7 @@ public class MainScreenActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.PersAcc) {
-            Toast.makeText(this, "Бу", Toast.LENGTH_SHORT).show();
+            //TODO Personal account
         }
 
         drawer = findViewById(R.id.drawer_layout);
