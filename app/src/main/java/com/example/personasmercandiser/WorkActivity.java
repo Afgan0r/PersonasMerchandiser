@@ -1,5 +1,6 @@
 package com.example.personasmercandiser;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -10,18 +11,22 @@ import com.example.personasmercandiser.Fragments.Fragment2;
 
 public class WorkActivity extends AppCompatActivity {
 
-    private String shopInf;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    public static int shopId, jobId, performerId;
+    private DatabaseHelper db;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_work);
+        db = new DatabaseHelper(this);
 
-//        Intent intent = getIntent();
-//        shopInf = intent.getStringExtra("ShopInf");
+        Intent intent = getIntent();
+        shopId = intent.getIntExtra("shopId", 0);
+        performerId = intent.getIntExtra("performerId", 0);
+        jobId = db.getJobId();
 
         tabLayout = findViewById(R.id.tablayout_id);
         viewPager = findViewById(R.id.viewpager_id);
@@ -34,15 +39,5 @@ public class WorkActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    private void listeners() {
 
-    }
-
-    private String getShopName(String shopInf) {
-        int start = shopInf.lastIndexOf("Название магазина - ") + 1;
-        int end = shopInf.indexOf("Адресс - ") - 1;
-        char[] buf = new char[end - start];
-        shopInf.getChars(start, end, buf, 0);
-        return new String(buf);
-    }
 }

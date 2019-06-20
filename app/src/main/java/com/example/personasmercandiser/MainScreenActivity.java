@@ -14,37 +14,40 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class MainScreenActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Toolbar toolbar;
-    private DrawerLayout drawer;
-    private NavigationView navigationView;
-    private ActionBarDrawerToggle toggle;
-    private ListView listView;
     private String[] buttonsText;
+    private ListView listView;
     private DatabaseHelper db;
+    private Date currDate;
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
 
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         listView=findViewById(R.id.ListView);
 
         db = new DatabaseHelper(this);
         fillListView();
-//        db.fillTables();
 
         drawer = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
         listeners();
     }
 
@@ -57,7 +60,20 @@ public class MainScreenActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = buttonsText[position];
                 Intent workScreen = new Intent(MainScreenActivity.this, WorkActivity.class);
-                workScreen.putExtra("ShopInf", selectedItem);
+
+                Intent intent = getIntent();
+                int performerId = intent.getIntExtra("performerId", 0);
+                int shopId = db.getShopIdByInf(selectedItem);
+                workScreen.putExtra("shopId", shopId);
+                workScreen.putExtra("performerId", performerId);
+
+                currDate = new Date();
+                DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+                String date = dateFormat.format(currDate);
+                dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String time = dateFormat.format(currDate);
+
+                db.createJob(shopId, performerId, date, time);
                 startActivity(workScreen);
             }
         });

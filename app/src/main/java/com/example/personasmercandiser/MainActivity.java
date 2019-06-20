@@ -34,8 +34,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 boolean res = db.checkLoginAndPass(emailText.getText().toString().trim(), passText.getText().toString().trim());
                 if (res) {
-//                    Toast.makeText(MainActivity.this, "Успешный вход", Toast.LENGTH_LONG).show();
+                    int loginId = db.getPerformerIdByEmail(emailText.getText().toString());
                     Intent mainScreenActivity = new Intent(MainActivity.this, MainScreenActivity.class);
+                    mainScreenActivity.putExtra("prformerId", loginId);
                     startActivity(mainScreenActivity);
                 } else {
                     Toast.makeText(MainActivity.this, "Неправильный логин или пароль.", Toast.LENGTH_LONG).show();

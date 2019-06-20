@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="125dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="50dp"
             android:layout_marginRight="125dp"
             android:background="@color/colorPrimaryGreen"
             android:text="QR код" />
@@ -85,7 +85,18 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:inputType="number" />
+
         </LinearLayout>
+
+        <Button
+            android:id="@+id/EnterDataButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="125dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="125dp"
+            android:background="@color/colorPrimaryGreen"
+            android:text="Внести данные" />
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
