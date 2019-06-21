@@ -6,10 +6,18 @@
     android:background="@drawable/screen1"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/editText"
+    <Button
+        android:id="@+id/DoPhotoButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="140dp"
+        android:layout_marginRight="140dp"
+        android:text="Фото" />
+
+    <EditText
+        android:id="@+id/NoteText"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
         android:ems="10"
         android:hint="Примечание"
         android:inputType="textPersonName"
@@ -18,10 +26,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="wrap_content"
+        android:id="@+id/UserPhoto"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        app:srcCompat="@drawable/screen1" />
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/SaveButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="125dp"
+        android:layout_marginRight="125dp"
+        android:text="Сохранить" />
 
 </LinearLayout>

@@ -10,7 +10,8 @@ import android.widget.Toast;
 
 public class CreateProductActivity extends AppCompatActivity {
 
-    EditText nomenclature, productCount, productPrice;
+    public static EditText nomenclature;
+    EditText productCount, productPrice;
     Button QRCheckButton, enterDataButton;
     DatabaseHelper db;
     int jobId;
@@ -36,6 +37,7 @@ public class CreateProductActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //TODO QR check
+                startActivity(new Intent(CreateProductActivity.this, BarCodeReaderActivity.class));
             }
         });
 
@@ -45,7 +47,7 @@ public class CreateProductActivity extends AppCompatActivity {
                 String nomenclatureString = nomenclature.getText().toString();
                 int productCountInt = Integer.parseInt(productCount.getText().toString());
                 double productPriceDouble = Double.parseDouble(productPrice.getText().toString());
-                if (nomenclatureString != null && productCountInt > 0 && productPriceDouble > 0) {
+                if (nomenclatureString.length() > 0 && productCountInt > 0 && productPriceDouble > 0) {
                     db.addProduct(jobId, nomenclatureString, productCountInt, productPriceDouble);
                     Intent workScreen = new Intent(CreateProductActivity.this, WorkActivity.class);
                     startActivity(workScreen);

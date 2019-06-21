@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SomeDB.db";
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 20;
 
     private static final String LOGIN_TABLE_NAME = "Login";
     private static final String LOGIN_TABLE_EMAIL = "email";
@@ -24,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String JOB_TABLE_PERFORMER = "Performer";
     private static final String JOB_TABLE_SHOP = "Shop";
     private static final String JOB_TABLE_PHOTO = "Photo";
+    private static final String JOB_TABLE_NOTE = "Note";
     private static final String JOB_TABLE_TIME = "Time";
     private static final String JOB_TABLE_DATE = "Date";
 
@@ -68,7 +69,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "Performer INTEGER, " +
                 "Photo TEXT, " +
                 "Time TEXT, " +
-                "Date TEXT, " +
+                "Date TEXT," +
+                "Note TEXT, " +
                 "FOREIGN KEY (Performer) REFERENCES Login(_id)," +
                 "FOREIGN KEY (Shop) REFERENCES Shop(_id))");
 
@@ -121,10 +123,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(PRODUCT_TABLE_NAME, null, contentValues);
     }
 
-    public void addPhoto(int job_id, String photo) {
+    public void addPhotoAndNote(int job_id, String photoPath, String note) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(JOB_TABLE_PHOTO, photo);
+        contentValues.put(JOB_TABLE_PHOTO, photoPath);
+        contentValues.put(JOB_TABLE_NOTE, note);
         String where = "_id=" + job_id;
         db.update(JOB_TABLE_NAME, contentValues, where, null);
     }

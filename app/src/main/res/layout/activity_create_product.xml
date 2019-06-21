@@ -19,7 +19,7 @@
             android:layout_marginTop="50dp"
             android:layout_marginRight="125dp"
             android:background="@color/colorPrimaryGreen"
-            android:text="QR код" />
+            android:text="Сканировать штрих код" />
 
         <LinearLayout
             android:layout_width="match_parent"
