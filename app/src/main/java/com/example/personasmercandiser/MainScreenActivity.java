@@ -22,24 +22,20 @@ import java.util.Locale;
 public class MainScreenActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private String[] buttonsText;
-    private ListView listView;
+    private String[] shops;
+    private ListView shopListView;
     private DatabaseHelper db;
-    private Date currDate;
     private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
+        db = new DatabaseHelper(this);
 
+        shopListView = findViewById(R.id.ListView);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        listView=findViewById(R.id.ListView);
-
-        db = new DatabaseHelper(this);
-        fillListView();
 
         drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -48,39 +44,41 @@ public class MainScreenActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
-        listeners();
+        fillListView();
     }
 
-    private void fillListView() {
-        buttonsText = db.getShops();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, buttonsText);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    private void fillListView() { // Filling list with shops
+        shops = db.getShops();
+
+        // Adapter fill list
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, shops);
+        shopListView.setAdapter(adapter);
+
+        shopListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItem = buttonsText[position];
-                Intent workScreen = new Intent(MainScreenActivity.this, WorkActivity.class);
+                String selectedItem = shops[position];
 
+                // Receiving date and time for Job
+                Date currDate = new Date();
+                DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+                String date = dateFormat.format(currDate);
+                dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String time = dateFormat.format(currDate);
+
+                // Receiving information for job
+                Intent workScreen = new Intent(MainScreenActivity.this, WorkActivity.class);
                 Intent intent = getIntent();
                 int performerId = intent.getIntExtra("performerId", 0);
                 int shopId = db.getShopIdByInf(selectedItem);
                 workScreen.putExtra("shopId", shopId);
                 workScreen.putExtra("performerId", performerId);
 
-                currDate = new Date();
-                DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-                String date = dateFormat.format(currDate);
-                dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                String time = dateFormat.format(currDate);
-
+                // Later job will store products and photo from shop
                 db.createJob(shopId, performerId, date, time);
                 startActivity(workScreen);
             }
         });
-    }
-
-    private void listeners() {
-
     }
 
     @Override

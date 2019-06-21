@@ -7,29 +7,31 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    public static final String DATABASE_NAME = "SomeDB.db";
-    public static final String JOB_TABLE_NAME = "Job";
+    private static final String DATABASE_NAME = "SomeDB.db";
+    private static final int DATABASE_VERSION = 19;
 
-    public static final String LOGIN_TABLE_NAME = "Login";
-    public static final String LOGIN_TABLE_EMAIL = "email";
-    public static final String LOGIN_TABLE_PASSWORD = "password";
+    private static final String LOGIN_TABLE_NAME = "Login";
+    private static final String LOGIN_TABLE_EMAIL = "email";
+    private static final String LOGIN_TABLE_PASSWORD = "password";
 
-    public static final String SHOP_TABLE_NAME = "Shop";
-    public static final String SHOP_TABLE_SHOPNAME = "Name";
-    public static final String SHOP_TABLE_ADDRESS = "Address";
-    public static final String SHOP_TABLE_LONGITUDE = "Longitude"; // Долгота
-    public static final String SHOP_TABLE_LATITUDE = "Latitude"; // Широта
-    public static final String JOB_TABLE_PERFORMER = "Performer";
-    public static final String JOB_TABLE_SHOP = "Shop";
-    public static final String JOB_TABLE_PHOTO = "Photo";
-    public static final String JOB_TABLE_TIME = "Time";
-    public static final String JOB_TABLE_DATE = "Date";
-    public static final String PRODUCT_TABLE_NAME = "Product";
-    public static final String PRODUCT_TABLE_NOMENCLATURE = "Nomenclature";
-    public static final String PRODUCT_TABLE_COUNT = "Count";
-    public static final String PRODUCT_TABLE_PRICE = "Price";
-    public static final String PRODUCT_TABLE_JOB = "Job_id";
-    private static final int DATABASE_VERSION = 18;
+    private static final String SHOP_TABLE_NAME = "Shop";
+    private static final String SHOP_TABLE_SHOPNAME = "Name";
+    private static final String SHOP_TABLE_ADDRESS = "Address";
+    private static final String SHOP_TABLE_LONGITUDE = "Longitude"; // Долгота
+    private static final String SHOP_TABLE_LATITUDE = "Latitude"; // Широта
+
+    private static final String JOB_TABLE_NAME = "Job";
+    private static final String JOB_TABLE_PERFORMER = "Performer";
+    private static final String JOB_TABLE_SHOP = "Shop";
+    private static final String JOB_TABLE_PHOTO = "Photo";
+    private static final String JOB_TABLE_TIME = "Time";
+    private static final String JOB_TABLE_DATE = "Date";
+
+    private static final String PRODUCT_TABLE_NAME = "Product";
+    private static final String PRODUCT_TABLE_NOMENCLATURE = "Nomenclature";
+    private static final String PRODUCT_TABLE_COUNT = "Count";
+    private static final String PRODUCT_TABLE_PRICE = "Price";
+    private static final String PRODUCT_TABLE_JOB = "Job_id";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -56,9 +58,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "Address TEXT," +
                 "Longitude TEXT," +
                 "Latitude TEXT);");
+
         db.execSQL("CREATE TABLE Login (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "email TEXT," +
                 "password TEXT);");
+
         db.execSQL("CREATE TABLE Job (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "Shop INTEGER, " +
                 "Performer INTEGER, " +
@@ -67,6 +71,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "Date TEXT, " +
                 "FOREIGN KEY (Performer) REFERENCES Login(_id)," +
                 "FOREIGN KEY (Shop) REFERENCES Shop(_id))");
+
         db.execSQL("CREATE TABLE Product (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "Nomenclature TEXT, " +
                 "Count INTEGER, " +
@@ -125,12 +130,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int getShopIdByInf(String shopInf) {
+        // I get big String here with shop name and shop address
+        // I pull address because it always unique
         int start = shopInf.indexOf("Адресс - ") + 9;
         int end = shopInf.length();
         char[] buf = new char[end - start];
         shopInf.getChars(start, end, buf, 0);
         String shopAdress = new String(buf);
 
+        // Finding shop id by his address that i receive higher
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(SHOP_TABLE_NAME, new String[]{"_id"}, SHOP_TABLE_ADDRESS + "=?", new String[]{shopAdress}, null, null, null);
         cursor.moveToFirst();
@@ -138,6 +146,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int getPerformerIdByEmail(String email) {
+        // I use email because its always unique
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(LOGIN_TABLE_NAME, new String[]{"_id"}, LOGIN_TABLE_EMAIL + "=?", new String[]{email}, null, null, null);
         cursor.moveToFirst();
@@ -145,6 +154,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int getJobId() {
+        // When this method is called new job already created and started, and i just take last id
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(JOB_TABLE_NAME, new String[]{"_id"}, null, null, null, null, null, null);
         cursor.moveToLast();
@@ -152,7 +162,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String[] getShops() {
-
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(SHOP_TABLE_NAME, new String[]{SHOP_TABLE_SHOPNAME, SHOP_TABLE_ADDRESS}, null, null, null, null, null);
 
@@ -165,27 +174,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "Адресс - " + cursor.getString(1);
             i++;
         }
+
+        cursor.close();
         return shopsText;
     }
 
-    public String[] getProductsName(int jobId) {
+    public String[] getProductsName(int jobId) {    // Get products that created in job
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT Nomenclature FROM Product WHERE Job_id=" + jobId, null);
-        String[] products = new String[0];
         cursor.moveToFirst();
-        if (cursor.getCount() > 0) {
-            products = new String[cursor.getCount()];
-            products[0] = cursor.getString(0);
-            int i = 1;
-            while (cursor.moveToNext()) {
-                products[i] = cursor.getString(0);
-                i++;
-            }
+        String[] products = new String[cursor.getCount()];
+
+        int i = 0;
+        while (cursor.moveToNext()) {
+            products[i] = cursor.getString(0);
+            i++;
         }
+
+        cursor.close();
         return products;
     }
 
-    public String[] getProductInf(String productNomenclature) {
+    public String[] getProductInf(String productNomenclature) { // Product nomenclature unique in job, so i use it to fill product information
         SQLiteDatabase db = this.getReadableDatabase();
         String where = PRODUCT_TABLE_NOMENCLATURE + "=?";
         Cursor cursor = db.query(PRODUCT_TABLE_NAME, new String[]{PRODUCT_TABLE_COUNT, PRODUCT_TABLE_PRICE}, where, new String[]{productNomenclature}, null, null, null);
@@ -194,6 +204,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] productInf = new String[2];
         productInf[0] = cursor.getString(0);
         productInf[1] = cursor.getString(1);
+
+        cursor.close();
         return productInf;
     }
 
@@ -201,10 +213,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String selection = LOGIN_TABLE_EMAIL + "=?" + " and " + LOGIN_TABLE_PASSWORD + "=?";
         String[] selectionArgs = {email, pass};
+
         Cursor cursor = db.query(LOGIN_TABLE_NAME, null, selection, selectionArgs, null, null, null);
+
         int count = cursor.getCount();
+
         cursor.close();
-        db.close();
         return count > 0;
     }
 }

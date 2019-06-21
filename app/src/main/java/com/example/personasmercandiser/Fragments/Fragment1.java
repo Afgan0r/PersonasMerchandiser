@@ -36,10 +36,14 @@ public class Fragment1 extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment1, container, false);
+
         addNewProductFAB = view.findViewById(R.id.AddNewProductFAB);
         db = new DatabaseHelper(getActivity());
         int jobId = WorkActivity.jobId;
+
         listeners();
+
+        // If job has products, then fill expandable list view
         if (db.getProductsName(jobId).length != 0) {
             fillList(jobId);
         }
@@ -56,29 +60,36 @@ public class Fragment1 extends Fragment {
     }
 
     public void fillList(int jobId) {
-        String[] groups = db.getProductsName(jobId);
+        String[] groupsTitle = db.getProductsName(jobId);
         expandableListView = view.findViewById(R.id.ProductListView);
-        String[] elements;
 
+        // Map for group titles
         ArrayList<Map<String, String>> groupData;
+        // Map for one item in group
         ArrayList<Map<String, String>> childDataItem;
+        // Map for all items in group
         ArrayList<ArrayList<Map<String, String>>> childData;
+        // Map for key and value pair
         Map<String, String> m;
 
         groupData = new ArrayList<Map<String, String>>();
-        for (String currGroup : groups) {
+        for (String currGroup : groupsTitle) {
             m = new HashMap<String, String>();
             m.put("groupName", currGroup);
             groupData.add(m);
         }
 
+        // Describe key for group titles
         String[] groupFrom = new String[]{"groupName"};
         int[] groupTo = new int[]{android.R.id.text1};
 
         childData = new ArrayList<ArrayList<Map<String, String>>>();
+        // Array for items in one group
+        String[] elements;
 
-        for (String currGroup : groups) {
+        for (String currGroup : groupsTitle) {
             childDataItem = new ArrayList<Map<String, String>>();
+            // Receiving count and price for product
             elements = db.getProductInf(currGroup);
 
             m = new HashMap<String, String>();
@@ -92,6 +103,7 @@ public class Fragment1 extends Fragment {
             childData.add(childDataItem);
         }
 
+        // Describe key for items
         String[] childFrom = new String[]{"elemInf"};
         int[] childTo = new int[]{android.R.id.text1};
 

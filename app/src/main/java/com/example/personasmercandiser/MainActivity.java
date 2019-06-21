@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button signIn;
     private EditText emailText, passText;
     private DatabaseHelper db;
 
@@ -18,9 +17,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         emailText = findViewById(R.id.email);
         passText = findViewById(R.id.pass);
         db = new DatabaseHelper(this);
+
         buttonListeners();
     }
 
@@ -28,20 +29,21 @@ public class MainActivity extends AppCompatActivity {
 
     public void buttonListeners() {
 
-        signIn = findViewById(R.id.signInButton);
+        Button signIn = findViewById(R.id.signInButton);
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean res = db.checkLoginAndPass(emailText.getText().toString().trim(), passText.getText().toString().trim());
                 if (res) {
+                    // Remember user id
                     int loginId = db.getPerformerIdByEmail(emailText.getText().toString());
                     Intent mainScreenActivity = new Intent(MainActivity.this, MainScreenActivity.class);
-                    mainScreenActivity.putExtra("prformerId", loginId);
+                    // PerformerId == User id
+                    mainScreenActivity.putExtra("performerId", loginId);
                     startActivity(mainScreenActivity);
                 } else {
                     Toast.makeText(MainActivity.this, "Неправильный логин или пароль.", Toast.LENGTH_LONG).show();
                 }
-//                Intent mainMenuIntent
             }
         });
     }
