@@ -28,9 +28,17 @@ public class CreateProductActivity extends AppCompatActivity {
         QRCheckButton = findViewById(R.id.OpenQRCodeCheckerButton);
         enterDataButton = findViewById(R.id.EnterDataButton);
         db = new DatabaseHelper(this);
-        Intent intent = this.getIntent();
+        Intent intent = getIntent();
         jobId = intent.getIntExtra("JobId", 0);
+        if (intent.getStringExtra("Nomenclature") != null) {
+            nomenclature.setText(intent.getStringExtra("Nomenclature"));
+        }
         listeners();
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, WorkActivity.class));
     }
 
     private void listeners() {

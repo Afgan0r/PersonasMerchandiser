@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.personasmercandiser.DatabaseHelper;
 import com.example.personasmercandiser.R;
@@ -130,6 +131,7 @@ public class Fragment2 extends Fragment {
             @Override
             public void onClick(View v) {
                 db.addPhotoAndNote(jobId, currentPhotoPath, noteText.getText().toString());
+                Toast.makeText(getActivity(), "Фото сохранено", Toast.LENGTH_SHORT).show();
             }
         });
         photoButton.setOnClickListener(new View.OnClickListener() {

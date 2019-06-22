@@ -1,5 +1,7 @@
 package com.example.personasmercandiser.Fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.Toast;
 
 import com.example.personasmercandiser.CreateProductActivity;
 import com.example.personasmercandiser.DatabaseHelper;
+import com.example.personasmercandiser.MainScreenActivity;
 import com.example.personasmercandiser.R;
 
 import java.util.ArrayList;
@@ -22,11 +26,13 @@ import java.util.Map;
 
 public class Fragment1 extends Fragment {
 
-    FloatingActionButton addNewProductFAB;
+    FloatingActionButton addNewProductFAB, editProductsFAB, saveJobFAB;
     ExpandableListView expandableListView;
     View view;
     DatabaseHelper db;
     private int jobId;
+    boolean isEdit;
+    private String[] groupsTitle;
 
 
     public Fragment1() {
@@ -36,20 +42,20 @@ public class Fragment1 extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment1, container, false);
-        addNewProductFAB = view.findViewById(R.id.AddNewProductFAB);
+        addNewProductFAB = view.findViewById(R.id.addNewProductFAB);
+        editProductsFAB = view.findViewById(R.id.EditProductsFAB);
+        saveJobFAB = view.findViewById(R.id.SaveJobFab);
         db = new DatabaseHelper(getActivity());
+        isEdit = false;
 
         Bundle bundle = this.getArguments();
-        jobId = 0;
-        if (bundle != null) {
-            jobId = bundle.getInt("JobId", 0);
-        }
+        jobId = bundle.getInt("JobId", 0);
 
-        listeners();
         // If job has products, then fill expandable list view
         if (db.getProductsName(jobId).length != 0) {
             fillList(jobId);
         }
+        listeners();
         return view;
     }
 
@@ -62,10 +68,77 @@ public class Fragment1 extends Fragment {
                 startActivity(createProductActivity);
             }
         });
+        editProductsFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (groupsTitle == null) {
+                    Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_SHORT).show();
+                } else {
+                    isEdit = !isEdit;
+                    if (isEdit) {
+                        Toast.makeText(getActivity(), "Выберите элемент для редактирования. Чтобы закончить редактирование нажмите на ту же самую кнопку.", Toast.LENGTH_LONG).show();
+                        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                            @Override
+                            public boolean onGroupClick(ExpandableListView parent, View v, final int groupPosition, long id) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setTitle("Редактирование")
+                                        .setMessage("Что вы хотите сделать?")
+                                        .setPositiveButton("Удалить элемент", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                db.deleteProduct(groupsTitle[groupPosition]);
+                                                fillList(jobId);
+                                            }
+                                        })
+                                        .setNegativeButton("Изменить элемент", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent createProductActivity = new Intent(getActivity(), CreateProductActivity.class);
+                                                createProductActivity.putExtra("Nomenclature", groupsTitle[groupPosition]);
+                                                createProductActivity.putExtra("JobId", jobId);
+                                                db.deleteProduct(groupsTitle[groupPosition]);
+                                                startActivity(createProductActivity);
+                                            }
+                                        })
+                                        .show();
+                                return false;
+                            }
+                        });
+                    } else {
+                        expandableListView.setOnGroupClickListener(null);
+                    }
+                }
+            }
+        });
+        saveJobFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (groupsTitle == null) {
+                    Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_SHORT).show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Сохранение")
+                            .setMessage("После сохранения вы не сможете изменить список и фото, вы уверены что хотите сохранить?")
+                            .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    startActivity(new Intent(getActivity(), MainScreenActivity.class));
+                                }
+                            })
+                            .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            })
+                            .show();
+                }
+            }
+        });
     }
 
     public void fillList(int jobId) {
-        String[] groupsTitle = db.getProductsName(jobId);
+        groupsTitle = db.getProductsName(jobId);
         expandableListView = view.findViewById(R.id.ProductListView);
 
         // Map for group titles

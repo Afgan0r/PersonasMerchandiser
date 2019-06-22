@@ -1,10 +1,12 @@
 package com.example.personasmercandiser;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.personasmercandiser.Fragments.Fragment1;
@@ -12,8 +14,7 @@ import com.example.personasmercandiser.Fragments.Fragment2;
 
 public class WorkActivity extends AppCompatActivity {
 
-    int shopId, jobId, performerId; // I use this in fragments
-
+    private int jobId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +24,6 @@ public class WorkActivity extends AppCompatActivity {
         DatabaseHelper db = new DatabaseHelper(this);
 
         Intent intent = getIntent();
-        shopId = intent.getIntExtra("shopId", 0);
-        performerId = intent.getIntExtra("performerId", 0);
         jobId = db.getJobId();
 
         // ViewPagerAdapter helps me to use TabLayout
@@ -47,5 +46,28 @@ public class WorkActivity extends AppCompatActivity {
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setCancelable(false)
+                .setMessage("Если вы выйдете, то введенные продукты и фото не сохраняться! Вы уверены что хотите выйти?")
+                .setTitle("Выход")
+                .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DatabaseHelper db = new DatabaseHelper(WorkActivity.this);
+                        db.deleteLastJobAndProducts(jobId);
+                        startActivity(new Intent(WorkActivity.this, MainScreenActivity.class));
+                    }
+                })
+                .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
     }
 }

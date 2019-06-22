@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SomeDB.db";
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 21;
 
     private static final String LOGIN_TABLE_NAME = "Login";
     private static final String LOGIN_TABLE_EMAIL = "email";
@@ -184,8 +184,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String[] getProductsName(int jobId) {    // Get products that created in job
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT Nomenclature FROM Product WHERE Job_id=" + jobId, null);
-        cursor.moveToFirst();
+        Cursor cursor = db.rawQuery("SELECT Nomenclature FROM Product WHERE Job_id=?", new String[]{String.valueOf(jobId)});
         String[] products = new String[cursor.getCount()];
 
         int i = 0;
@@ -223,5 +222,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return count > 0;
+    }
+
+    public void deleteLastJobAndProducts(int jobId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(JOB_TABLE_NAME, "_id=?", new String[]{String.valueOf(jobId)});
+        db.delete(PRODUCT_TABLE_NAME, PRODUCT_TABLE_JOB + "=?", new String[]{String.valueOf(jobId)});
+    }
+
+    public void deleteProduct(String nomenclature) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(PRODUCT_TABLE_NAME, PRODUCT_TABLE_NOMENCLATURE + "=?", new String[]{nomenclature});
     }
 }
