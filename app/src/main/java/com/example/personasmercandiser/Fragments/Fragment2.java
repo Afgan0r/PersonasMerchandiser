@@ -21,7 +21,6 @@ import android.widget.ImageView;
 
 import com.example.personasmercandiser.DatabaseHelper;
 import com.example.personasmercandiser.R;
-import com.example.personasmercandiser.WorkActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +38,7 @@ public class Fragment2 extends Fragment {
     EditText noteText;
     Button saveButton, photoButton;
     DatabaseHelper db;
+    private int jobId;
 
     public Fragment2() {
     }
@@ -50,10 +50,13 @@ public class Fragment2 extends Fragment {
         image = view.findViewById(R.id.UserPhoto);
         noteText = view.findViewById(R.id.NoteText);
         db = new DatabaseHelper(getActivity());
-
-        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 2);
         saveButton = view.findViewById(R.id.SaveButton);
         photoButton = view.findViewById(R.id.DoPhotoButton);
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            jobId = bundle.getInt("JobId", 0);
+        }
+        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 2);
         listeners();
         return view;
     }
@@ -126,7 +129,7 @@ public class Fragment2 extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.addPhotoAndNote(WorkActivity.jobId, currentPhotoPath, noteText.getText().toString());
+                db.addPhotoAndNote(jobId, currentPhotoPath, noteText.getText().toString());
             }
         });
         photoButton.setOnClickListener(new View.OnClickListener() {

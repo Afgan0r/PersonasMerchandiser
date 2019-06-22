@@ -10,8 +10,8 @@ import android.widget.Toast;
 
 public class CreateProductActivity extends AppCompatActivity {
 
-    public static EditText nomenclature;
-    EditText productCount, productPrice;
+
+    EditText productCount, productPrice, nomenclature;
     Button QRCheckButton, enterDataButton;
     DatabaseHelper db;
     int jobId;
@@ -28,7 +28,8 @@ public class CreateProductActivity extends AppCompatActivity {
         QRCheckButton = findViewById(R.id.OpenQRCodeCheckerButton);
         enterDataButton = findViewById(R.id.EnterDataButton);
         db = new DatabaseHelper(this);
-        jobId = WorkActivity.jobId;
+        Intent intent = this.getIntent();
+        jobId = intent.getIntExtra("JobId", 0);
         listeners();
     }
 
@@ -36,7 +37,6 @@ public class CreateProductActivity extends AppCompatActivity {
         QRCheckButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO QR check
                 startActivity(new Intent(CreateProductActivity.this, BarCodeReaderActivity.class));
             }
         });
@@ -57,4 +57,6 @@ public class CreateProductActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }

@@ -15,7 +15,6 @@ import android.widget.SimpleExpandableListAdapter;
 import com.example.personasmercandiser.CreateProductActivity;
 import com.example.personasmercandiser.DatabaseHelper;
 import com.example.personasmercandiser.R;
-import com.example.personasmercandiser.WorkActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +26,7 @@ public class Fragment1 extends Fragment {
     ExpandableListView expandableListView;
     View view;
     DatabaseHelper db;
+    private int jobId;
 
 
     public Fragment1() {
@@ -36,13 +36,16 @@ public class Fragment1 extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment1, container, false);
-
         addNewProductFAB = view.findViewById(R.id.AddNewProductFAB);
         db = new DatabaseHelper(getActivity());
-        int jobId = WorkActivity.jobId;
+
+        Bundle bundle = this.getArguments();
+        jobId = 0;
+        if (bundle != null) {
+            jobId = bundle.getInt("JobId", 0);
+        }
 
         listeners();
-
         // If job has products, then fill expandable list view
         if (db.getProductsName(jobId).length != 0) {
             fillList(jobId);
@@ -54,7 +57,9 @@ public class Fragment1 extends Fragment {
         addNewProductFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), CreateProductActivity.class));
+                Intent createProductActivity = new Intent(getActivity(), CreateProductActivity.class);
+                createProductActivity.putExtra("JobId", jobId);
+                startActivity(createProductActivity);
             }
         });
     }

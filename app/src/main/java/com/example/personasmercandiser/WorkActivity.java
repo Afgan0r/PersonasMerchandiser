@@ -3,6 +3,7 @@ package com.example.personasmercandiser;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -11,7 +12,7 @@ import com.example.personasmercandiser.Fragments.Fragment2;
 
 public class WorkActivity extends AppCompatActivity {
 
-    public static int shopId, jobId, performerId; // I use this in fragments
+    int shopId, jobId, performerId; // I use this in fragments
 
 
     @Override
@@ -31,8 +32,18 @@ public class WorkActivity extends AppCompatActivity {
         ViewPager viewPager = findViewById(R.id.viewpager_id);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        adapter.AddFragment(new Fragment1(), "Товары");
-        adapter.AddFragment(new Fragment2(), "Фото");
+        Bundle bundle = new Bundle();
+        bundle.putInt("JobId", jobId);
+        Fragment fragment1 = new Fragment1();
+        fragment1.setArguments(bundle);
+
+        bundle.clear();
+        bundle.putInt("JobId", jobId);
+        Fragment fragment2 = new Fragment2();
+        fragment2.setArguments(bundle);
+
+        adapter.AddFragment(fragment1, "Товары");
+        adapter.AddFragment(fragment2, "Фото");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
