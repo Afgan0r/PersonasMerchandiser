@@ -28,6 +28,7 @@ public class MainScreenActivity extends AppCompatActivity
     private ListView shopListView;
     private DatabaseHelper db;
     private DrawerLayout drawer;
+    int performerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +72,7 @@ public class MainScreenActivity extends AppCompatActivity
                 // Receiving information for job
                 Intent workScreen = new Intent(MainScreenActivity.this, WorkActivity.class);
                 Intent intent = getIntent();
-                int performerId = intent.getIntExtra("performerId", 0);
+                performerId = intent.getIntExtra("performerId", 0);
                 int shopId = db.getShopIdByInf(selectedItem);
                 workScreen.putExtra("shopId", shopId);
                 workScreen.putExtra("performerId", performerId);
@@ -115,7 +116,9 @@ public class MainScreenActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.PersAcc) {
-            //TODO Personal account
+            Intent personalCabinet = new Intent(this, PersonalCabinetActivity.class);
+            personalCabinet.putExtra("UserId", performerId);
+            startActivity(personalCabinet);
         }
 
         drawer = findViewById(R.id.drawer_layout);

@@ -4,5 +4,5 @@
     tools:showIn="navigation_view">
     <item
         android:id="@+id/PersAcc"
-        android:title="Личный кабинет" />
+        android:title="Выполненые работы" />
 </menu>

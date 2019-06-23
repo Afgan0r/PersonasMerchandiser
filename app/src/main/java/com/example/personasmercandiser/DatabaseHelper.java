@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "SomeDB.db";
-    private static final int DATABASE_VERSION = 21;
+    private static final int DATABASE_VERSION = 22;
 
     private static final String LOGIN_TABLE_NAME = "Login";
     private static final String LOGIN_TABLE_EMAIL = "email";
@@ -233,5 +233,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteProduct(String nomenclature) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(PRODUCT_TABLE_NAME, PRODUCT_TABLE_NOMENCLATURE + "=?", new String[]{nomenclature});
+    }
+
+    public String[] getJobs(int performerId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT Shop.Name, Job.Time, Job.Date, Job.Performer " +
+                "FROM Job INNER JOIN Shop ON Shop._id = Job.Shop " +
+                "WHERE Job.Performer = ?", new String[]{String.valueOf(performerId)});
+
+        String[] jobs = new String[cursor.getCount()];
+        int i = 0;
+        while (cursor.moveToNext()) {
+            jobs[i] = "Магазин - " + cursor.getString(0) + "\n"
+                    + "Дата - " + cursor.getString(2) + "\n"
+                    + "Время - " + cursor.getString(1);
+            i++;
+        }
+        cursor.close();
+        return jobs;
+    }
+
+    public String[] getJobFullInfo(int jobId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT Shop.Name, Shop.Address, Job.Time, Job.Date, Job.Note, Job.Photo " +
+                "FROM Job INNER JOIN Shop ON Shop._id = Job.Shop " +
+                "WHERE Job._id = ?", new String[]{String.valueOf(jobId)});
+        String[] jobInf = new String[6];
+        cursor.moveToFirst();
+        for (int i = 0; i < 6; i++) {
+            jobInf[i] = cursor.getString(i);
+        }
+        cursor.close();
+        return jobInf;
+    }
+
+    public int getJobIdByInf(String inf) {
+        String date, time;
+        int startDate = inf.indexOf("Дата - ") + 7;
+        int endDate = inf.indexOf("Время - ") - 1;
+        char[] bufDate = new char[endDate - startDate];
+        inf.getChars(startDate, endDate, bufDate, 0);
+        date = new String(bufDate);
+
+        int startTime = inf.indexOf("Время - ") + 8;
+        int endTime = inf.length();
+        char[] bufTime = new char[endTime - startTime];
+        inf.getChars(startTime, endTime, bufTime, 0);
+        time = new String(bufTime);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(JOB_TABLE_NAME, new String[]{"_id"}, JOB_TABLE_DATE + "=? and " + JOB_TABLE_TIME + "=?", new String[]{date, time}, null, null, null);
+
+        cursor.moveToFirst();
+        return cursor.getInt(0);
     }
 }

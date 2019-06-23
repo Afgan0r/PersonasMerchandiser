@@ -95,22 +95,15 @@ public class Fragment2 extends Fragment {
         return image;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            getImage(currentPhotoPath);
-        }
-    }
-
-    private void getImage(String photoPath) {
+    public static Bitmap getImage(String photoPath, ImageView targetImageView) {
         // Get the dimensions of the View
-        int targetW = image.getWidth();
-        int targetH = image.getHeight();
+        int targetW = targetImageView.getWidth();
+        int targetH = targetImageView.getHeight();
 
         // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
+        BitmapFactory.decodeFile(photoPath, bmOptions);
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
 
@@ -122,8 +115,19 @@ public class Fragment2 extends Fragment {
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
 
-        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
-        image.setImageBitmap(bitmap);
+        Bitmap bitmap = BitmapFactory.decodeFile(photoPath, bmOptions);
+        return bitmap;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            image.post(new Runnable() {
+                public void run() {
+                    image.setImageBitmap(getImage(currentPhotoPath, image));
+                }
+            });
+        }
     }
 
     private void listeners() {

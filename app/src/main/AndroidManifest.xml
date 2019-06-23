@@ -16,6 +16,8 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".FullJobInfoActivity"></activity>
+        <activity android:name=".PersonalCabinetActivity" />
         <activity android:name=".BarCodeReaderActivity" />
         <activity android:name=".CreateProductActivity" />
         <activity android:name=".WorkActivity" />
